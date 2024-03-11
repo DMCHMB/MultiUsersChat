@@ -10,19 +10,19 @@ import java.util.Set;
 
 public class ViewGuiClient {
     private final Client client;
-    private JFrame frame = new JFrame("Р§Р°С‚");
+    private JFrame frame = new JFrame("Чат");
     private JTextArea messages = new JTextArea(30, 20);
     private JTextArea users = new JTextArea(30, 15);
     private JPanel panel = new JPanel();
     private JTextField textField = new JTextField(40);
-    private JButton buttonDisable = new JButton("РћС‚РєР»СЋС‡РёС‚СЊСЃСЏ");
-    private JButton buttonConnect = new JButton("РџРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ");
+    private JButton buttonDisable = new JButton("Отключиться");
+    private JButton buttonConnect = new JButton("Подключиться");
 
     public ViewGuiClient(Client client) {
         this.client = client;
     }
 
-    //РјРµС‚РѕРґ, РёРЅРёС†РёР°Р»РёР·РёСЂСѓСЋС‰РёР№ РіСЂР°С„РёС‡РµСЃРєРёР№ РёРЅС‚РµСЂС„РµР№СЃ РєР»РёРµРЅС‚СЃРєРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    //метод, инициализирующий графический интерфейс клиентского приложения
     protected void initFrameClient() {
         messages.setEditable(false);
         users.setEditable(false);
@@ -33,9 +33,9 @@ public class ViewGuiClient {
         panel.add(buttonDisable);
         frame.add(panel, BorderLayout.SOUTH);
         frame.pack();
-        frame.setLocationRelativeTo(null); // РїСЂРё Р·Р°РїСѓСЃРєРµ РѕС‚РѕР±СЂР°Р¶Р°РµС‚ РѕРєРЅРѕ РїРѕ С†РµРЅС‚СЂСѓ СЌРєСЂР°РЅР°
+        frame.setLocationRelativeTo(null); // при запуске отображает окно по центру экрана
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        //РєР»Р°СЃСЃ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ РїСЂРё Р·Р°РєСЂС‹С‚РёРё РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ РЎРµСЂРІРµСЂР°
+        //класс обработки события при закрытии окна приложения Сервера
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -71,11 +71,11 @@ public class ViewGuiClient {
         messages.append(text);
     }
 
-    //РјРµС‚РѕРґ РѕР±РЅРѕРІР»СЏСЋС‰РёР№ СЃРїРёСЃРѕ РёРјРµРЅ РїРѕРґР»СЋС‡РёРІС€РёС…СЃСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
+    //метод обновляющий списо имен подлючившихся пользователей
     protected void refreshListUsers(Set<String> listUsers) {
         users.setText("");
         if (client.isConnect()) {
-            StringBuilder text = new StringBuilder("РЎРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№:\n");
+            StringBuilder text = new StringBuilder("Список пользователей:\n");
             for (String user : listUsers) {
                 text.append(user + "\n");
             }
@@ -83,51 +83,51 @@ public class ViewGuiClient {
         }
     }
 
-    //РІС‹Р·С‹РІР°РµС‚ РѕРєРЅРѕ РґР»СЏ РІРІРѕРґР° Р°РґСЂРµСЃР° СЃРµСЂРІРµСЂР°
+    //вызывает окно для ввода адреса сервера
     protected String getServerAddressFromOptionPane() {
         while (true) {
             String addressServer = JOptionPane.showInputDialog(
-                    frame, "Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ СЃРµСЂРІРµСЂР°:",
-                    "Р’РІРѕРґ Р°РґСЂРµСЃР° СЃРµСЂРІРµСЂР°",
+                    frame, "Введите адрес сервера:",
+                    "Ввод адреса сервера",
                     JOptionPane.QUESTION_MESSAGE
             );
             return addressServer.trim();
         }
     }
 
-    //РІС‹Р·С‹РІР°РµС‚ РѕРєРЅРѕ РґР»СЏ РІРІРѕРґР° РїРѕСЂС‚Р° СЃРµСЂРІРµСЂР°
+    //вызывает окно для ввода порта сервера
     protected int getPortServerFromOptionPane() {
         while (true) {
             String port = JOptionPane.showInputDialog(
-                    frame, "Р’РІРµРґРёС‚Рµ РїРѕСЂС‚ СЃРµСЂРІРµСЂР°:",
-                    "Р’РІРѕРґ РїРѕСЂС‚Р° СЃРµСЂРІРµСЂР°",
+                    frame, "Введите порт сервера:",
+                    "Ввод порта сервера",
                     JOptionPane.QUESTION_MESSAGE
             );
             try {
                 return Integer.parseInt(port.trim());
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(
-                        frame, "Р’РІРµРґРµРЅ РЅРµРєРєРѕСЂРµРєС‚РЅС‹Р№ РїРѕСЂС‚ СЃРµСЂРІРµСЂР°. РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰Рµ СЂР°Р·.",
-                        "РћС€РёР±РєР° РІРІРѕРґР° РїРѕСЂС‚Р° СЃРµСЂРІРµСЂР°", JOptionPane.ERROR_MESSAGE
+                        frame, "Введен неккоректный порт сервера. Попробуйте еще раз.",
+                        "Ошибка ввода порта сервера", JOptionPane.ERROR_MESSAGE
                 );
             }
         }
     }
 
-    //РІС‹Р·С‹РІР°РµС‚ РѕРєРЅР° РґР»СЏ РІРІРѕРґР° РёРјРµРЅРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+    //вызывает окна для ввода имени пользователя
     protected String getNameUser() {
         return JOptionPane.showInputDialog(
-                frame, "Р’РІРµРґРёС‚Рµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ:",
-                "Р’РІРѕРґ РёРјРµРЅРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
+                frame, "Введите имя пользователя:",
+                "Ввод имени пользователя",
                 JOptionPane.QUESTION_MESSAGE
         );
     }
 
-    //РІС‹Р·С‹РІР°РµС‚ РѕРєРЅРѕ РѕС€РёР±РєРё СЃ Р·Р°РґР°РЅРЅС‹Рј С‚РµРєСЃС‚РѕРј
+    //вызывает окно ошибки с заданным текстом
     protected void errorDialogWindow(String text) {
         JOptionPane.showMessageDialog(
                 frame, text,
-                "РћС€РёР±РєР°", JOptionPane.ERROR_MESSAGE
+                "Ошибка", JOptionPane.ERROR_MESSAGE
         );
     }
 }

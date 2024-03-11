@@ -11,7 +11,9 @@ public class Client {
     private Connection connection;
     private static ModelGuiClient model;
     private static ViewGuiClient gui;
-    private volatile boolean isConnect = false; //С„Р»Р°Рі РѕС‚РѕР±Р°СЂР¶Р°СЋС‰РёР№ СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РєР»РёРµРЅС‚Р°  СЃРµСЂРІРµСЂСѓ
+    private volatile boolean isConnect = false; //флаг отобаржающий состояние подключения клиента  серверу
+
+    private String userName;
 
     public boolean isConnect() {
         return isConnect;
@@ -21,7 +23,7 @@ public class Client {
         isConnect = connect;
     }
 
-    //С‚РѕС‡РєР° РІС…РѕРґР° РІ РєР»РёРµРЅС‚СЃРєРѕРµ РїСЂРёР»РѕР¶РµРЅРёРµ
+    //точка входа в клиентское приложение
     public static void main(String[] args) {
         Client client = new Client();
         model = new ModelGuiClient();
@@ -36,98 +38,103 @@ public class Client {
         }
     }
 
-    //РјРµС‚РѕРґ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РєР»РёРµРЅС‚Р°  СЃРµСЂРІРµСЂСѓ
+    //метод подключения клиента  серверу
     protected void connectToServer() {
-        //РµСЃР»Рё РєР»РёРµРЅС‚ РЅРµ РїРѕРґРєР»СЋС‡РµРЅ  СЃРµСЂРІРµСЂРµ С‚Рѕ..
+        //если клиент не подключен  сервере то..
         if (!isConnect) {
             while (true) {
                 try {
-                    //РІС‹Р·С‹РІР°РµРј РѕРєРЅР° РІРІРѕРґР° Р°РґСЂРµСЃР°, РїРѕСЂС‚Р° СЃРµСЂРІРµСЂР°
+                    //вызываем окна ввода адреса, порта сервера
                     String addressServer = gui.getServerAddressFromOptionPane();
                     int port = gui.getPortServerFromOptionPane();
-                    //СЃРѕР·РґР°РµРј СЃРѕРєРµС‚ Рё РѕР±СЉРµРєС‚ connection
+                    //создаем сокет и объект connection
                     Socket socket = new Socket(addressServer, port);
                     connection = new Connection(socket);
                     isConnect = true;
-                    gui.addMessage("РЎРµСЂРІРёСЃРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ: Р’С‹ РїРѕРґРєР»СЋС‡РёР»РёСЃСЊ Рє СЃРµСЂРІРµСЂСѓ.\n");
+                    gui.addMessage("Сервисное сообщение: Вы подключились к серверу.\n");
                     break;
                 } catch (Exception e) {
-                    gui.errorDialogWindow("РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР°! Р’РѕР·РјРѕР¶РЅРѕ Р’С‹ РІРІРµР»Рё РЅРµ РІРµСЂРЅС‹Р№ Р°РґСЂРµСЃ СЃРµСЂРІРµСЂР° РёР»Рё РїРѕСЂС‚. РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰Рµ СЂР°Р·");
+                    gui.errorDialogWindow("Произошла ошибка! Возможно Вы ввели не верный адрес сервера или порт. Попробуйте еще раз");
                     break;
                 }
             }
-        } else gui.errorDialogWindow("Р’С‹ СѓР¶Рµ РїРѕРґРєР»СЋС‡РµРЅС‹!");
+        } else gui.errorDialogWindow("Вы уже подключены!");
     }
 
-    //РјРµС‚РѕРґ, СЂРµР°Р»РёР·СѓСЋС‰РёР№ СЂРµРіРёСЃС‚СЂР°С†РёСЋ РёРјРµРЅРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ СЃРѕ СЃС‚РѕСЂРѕРЅС‹ РєР»РёРµРЅС‚СЃРєРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    //метод, реализующий регистрацию имени пользователя со стороны клиентского приложения
     protected void nameUserRegistration() {
         while (true) {
             try {
                 Message message = connection.receive();
-                //РїСЂРёРЅСЏР»Рё РѕС‚ СЃРµСЂРІРµСЂР° СЃРѕРѕР±С‰РµРЅРёРµ, РµСЃР»Рё СЌС‚Рѕ Р·Р°РїСЂРѕСЃ РёРјРµРЅРё, С‚Рѕ РІС‹Р·С‹РІР°РµРј РѕРєРЅР° РІРІРѕРґР° РёРјРµРЅРё, РѕС‚РїСЂР°РІР»СЏРµРј РЅР° СЃРµСЂРІРµСЂ РёРјСЏ
+                //приняли от сервера сообщение, если это запрос имени, то вызываем окна ввода имени, отправляем на сервер имя
                 if (message.getTypeMessage() == MessageType.REQUEST_NAME_USER) {
                     String nameUser = gui.getNameUser();
+                    this.userName = nameUser;
                     connection.send(new Message(MessageType.USER_NAME, nameUser));
                 }
-                //РµСЃР»Рё СЃРѕРѕР±С‰РµРЅРёРµ - РёРјСЏ СѓР¶Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, РІС‹РІРѕРґРёРј СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ РѕСѓРЅРѕ СЃ РѕС€РёР±РѕР№, РїРѕРІС‚РѕСЂСЏРµРј РІРІРѕРґ РёРјРµРЅРё
+                //если сообщение - имя уже используется, выводим соответствующее оуно с ошибой, повторяем ввод имени
                 if (message.getTypeMessage() == MessageType.NAME_USED) {
-                    gui.errorDialogWindow("Р”Р°РЅРЅРѕРµ РёРјСЏ СѓР¶Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, РІРІРµРґРёС‚Рµ РґСЂСѓРіРѕРµ");
+                    gui.errorDialogWindow("Данное имя уже используется, введите другое");
                     String nameUser = gui.getNameUser();
                     connection.send(new Message(MessageType.USER_NAME, nameUser));
                 }
-                //РµСЃР»Рё РёРјСЏ РїСЂРёРЅСЏС‚Рѕ, РїРѕР»СѓС‡Р°РµРј РјРЅРѕР¶РµСЃС‚РІРѕ РІСЃРµС… РїРѕРґРєР»СЋС‡РёРІС€РёС…СЃСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№, РІС‹С…РѕРґРёРј РёР· С†РёРєР»Р°
+                //если имя принято, получаем множество всех подключившихся пользователей, выходим из цикла
                 if (message.getTypeMessage() == MessageType.NAME_ACCEPTED) {
-                    gui.addMessage("РЎРµСЂРІРёСЃРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ: РІР°С€Рµ РёРјСЏ РїСЂРёРЅСЏС‚Рѕ!\n");
+                    gui.addMessage("Сервисное сообщение: ваше имя принято!\n");
                     model.setUsers(message.getListUsers());
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                gui.errorDialogWindow("РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё СЂРµРіРёСЃС‚СЂР°С†РёРё РёРјРµРЅРё. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРµСЂРµРїРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ");
+                gui.errorDialogWindow("Произошла ошибка при регистрации имени. Попробуйте переподключиться");
                 try {
                     connection.close();
                     isConnect = false;
                     break;
                 } catch (IOException ex) {
-                    gui.errorDialogWindow("РћС€РёР±РєР° РїСЂРё Р·Р°РєСЂС‹С‚РёРё СЃРѕРµРґРёРЅРµРЅРёСЏ");
+                    gui.errorDialogWindow("Ошибка при закрытии соединения");
                 }
             }
 
         }
     }
 
-    //РјРµС‚РѕРґ РѕС‚РїСЂР°РІРєРё СЃРѕРѕР±С‰РµРЅРёСЏ РїСЂРµРґРЅР°Р·РЅР°С‡РµРЅРЅРѕРіРѕ РґР»СЏ РґСЂСѓРіРёС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ РЅР° СЃРµСЂРІРµСЂ
+    //метод отправки сообщения предназначенного для других пользователей на сервер
     protected void sendMessageOnServer(String text) {
         try {
             connection.send(new Message(MessageType.TEXT_MESSAGE, text));
         } catch (Exception e) {
-            gui.errorDialogWindow("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРё СЃРѕРѕР±С‰РµРЅРёСЏ");
+            gui.errorDialogWindow("Ошибка при отправки сообщения");
         }
     }
 
-    //РјРµС‚РѕРґ РїСЂРёРЅРёРјР°СЋС‰РёР№ СЃ СЃРµСЂРІРµСЂР° СЃРѕР±С‰РµРЅРёРµ РѕС‚ РґСЂСѓРіРёС… РєР»РёРµРЅС‚РѕРІ
+    //метод принимающий с сервера собщение от других клиентов
     protected void receiveMessageFromServer() {
         while (isConnect) {
             try {
                 Message message = connection.receive();
-                //РµСЃР»Рё С‚РёРї TEXT_MESSAGE, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј С‚РµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ РІ РѕРєРЅРѕ РїРµСЂРµРїРёСЃРєРё
+                //если тип TEXT_MESSAGE, то добавляем текст сообщения в окно переписки
                 if (message.getTypeMessage() == MessageType.TEXT_MESSAGE) {
                     gui.addMessage(message.getTextMessage());
+                    if (!this.userName.equals(extractNameFromMessage(message.getTextMessage()))) {
+                        String cmd = "msg * " + "\"" + message.getTextMessage() + "\"";
+                        Runtime.getRuntime().exec(cmd);
+                    }
                 }
-                //РµСЃР»Рё СЃРѕРѕР±С‰РµРЅРёРµ СЃ С‚РёРїРѕ USER_ADDED РґРѕР±Р°РІР»СЏРµРј СЃРѕРѕР±С‰РµРЅРёРµ РІ РѕРєРЅРѕ РїРµСЂРµРїРёСЃРєРё Рѕ РЅРѕРІРѕРј РїРѕР»СЊР·РѕРІР°С‚РµР»Рµ
+                //если сообщение с типо USER_ADDED добавляем сообщение в окно переписки о новом пользователе
                 if (message.getTypeMessage() == MessageType.USER_ADDED) {
                     model.addUser(message.getTextMessage());
                     gui.refreshListUsers(model.getUsers());
-                    gui.addMessage(String.format("РЎРµСЂРІРёСЃРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ: РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ %s РїСЂРёСЃРѕРµРґРёРЅРёР»СЃСЏ Рє С‡Р°С‚Сѓ.\n", message.getTextMessage()));
+                    gui.addMessage(String.format("Сервисное сообщение: пользователь %s присоединился к чату.\n", message.getTextMessage()));
                 }
-                //Р°РЅР°Р»РѕРіРёС‡РЅРѕ РґР»СЏ РѕС‚РєР»СЋС‡РµРЅРёСЏ РґСЂСѓРіРёС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
+                //аналогично для отключения других пользователей
                 if (message.getTypeMessage() == MessageType.REMOVED_USER) {
                     model.removeUser(message.getTextMessage());
                     gui.refreshListUsers(model.getUsers());
-                    gui.addMessage(String.format("РЎРµСЂРІРёСЃРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ: РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ %s РїРѕРєРёРЅСѓР» С‡Р°С‚.\n", message.getTextMessage()));
+                    gui.addMessage(String.format("Сервисное сообщение: пользователь %s покинул чат.\n", message.getTextMessage()));
                 }
             } catch (Exception e) {
-                gui.errorDialogWindow("РћС€РёР±РєР° РїСЂРё РїСЂРёРµРјРµ СЃРѕРѕР±С‰РµРЅРёСЏ РѕС‚ СЃРµСЂРІРµСЂР°.");
+                gui.errorDialogWindow("Ошибка при приеме сообщения от сервера.");
                 setConnect(false);
                 gui.refreshListUsers(model.getUsers());
                 break;
@@ -135,7 +142,7 @@ public class Client {
         }
     }
 
-    //РјРµС‚РѕРґ СЂРµР°Р»РёР·СѓСЋС‰РёР№ РѕС‚РєР»СЋС‡РµРЅРёРµ РЅР°С€РµРіРѕ РєР»РёРµРЅС‚Р° РѕС‚ С‡Р°С‚Р°
+    //метод реализующий отключение нашего клиента от чата
     protected void disableClient() {
         try {
             if (isConnect) {
@@ -143,9 +150,13 @@ public class Client {
                 model.getUsers().clear();
                 isConnect = false;
                 gui.refreshListUsers(model.getUsers());
-            } else gui.errorDialogWindow("Р’С‹ СѓР¶Рµ РѕС‚РєР»СЋС‡РµРЅС‹.");
+            } else gui.errorDialogWindow("Вы уже отключены.");
         } catch (Exception e) {
-            gui.errorDialogWindow("РЎРµСЂРІРёСЃРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ: РїСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё РѕС‚РєР»СЋС‡РµРЅРёРё.");
+            gui.errorDialogWindow("Сервисное сообщение: произошла ошибка при отключении.");
         }
+    }
+
+    private String extractNameFromMessage (String message) {
+        return message.split(":")[0];
     }
 }
