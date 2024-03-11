@@ -1,6 +1,8 @@
-package Client;
+package client;
 
-import Connection.*;
+import connection.Connection;
+import connection.Message;
+import connection.MessageType;
 
 import java.io.IOException;
 import java.net.Socket;

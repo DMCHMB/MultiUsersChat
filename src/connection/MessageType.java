@@ -1,4 +1,4 @@
-package Connection;
+package connection;
 
 public enum MessageType {
     REQUEST_NAME_USER,

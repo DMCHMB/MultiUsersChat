@@ -1,6 +1,8 @@
-package Server;
+package server;
 
-import Connection.*;
+import connection.Connection;
+import connection.Message;
+import connection.MessageType;
 
 import java.net.ServerSocket;
 import java.net.Socket;
