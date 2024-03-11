@@ -45,8 +45,10 @@ public class Client {
             while (true) {
                 try {
                     //вызываем окна ввода адреса, порта сервера
-                    String addressServer = gui.getServerAddressFromOptionPane();
-                    int port = gui.getPortServerFromOptionPane();
+//                    String addressServer = gui.getServerAddressFromOptionPane();
+//                    int port = gui.getPortServerFromOptionPane();
+                    String addressServer = "192.168.1.222";
+                    int port = 1111;
                     //создаем сокет и объект connection
                     Socket socket = new Socket(addressServer, port);
                     connection = new Connection(socket);

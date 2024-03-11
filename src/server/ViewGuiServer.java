@@ -9,10 +9,10 @@ import java.awt.event.WindowEvent;
 
 
 public class ViewGuiServer {
-    private JFrame frame = new JFrame("Запуск сервера");
+    private JFrame frame = new JFrame("Р—Р°РїСѓСЃРє СЃРµСЂРІРµСЂР°");
     private JTextArea dialogWindow = new JTextArea(10, 40);
-    private JButton buttonStartServer = new JButton("Запустить сервер");
-    private JButton buttonStopServer = new JButton("Остановить сервер");
+    private JButton buttonStartServer = new JButton("Р—Р°РїСѓСЃС‚РёС‚СЊ СЃРµСЂРІРµСЂ");
+    private JButton buttonStopServer = new JButton("РћСЃС‚Р°РЅРѕРІРёС‚СЊ СЃРµСЂРІРµСЂ");
     private JPanel panelButtons = new JPanel();
     private final Server server;
 
@@ -20,18 +20,18 @@ public class ViewGuiServer {
         this.server = server;
     }
 
-    //метод инициализации графического интерфейса приложения сервера
+    //РјРµС‚РѕРґ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ РёРЅС‚РµСЂС„РµР№СЃР° РїСЂРёР»РѕР¶РµРЅРёСЏ СЃРµСЂРІРµСЂР°
     protected void initFrameServer() {
         dialogWindow.setEditable(false);
-        dialogWindow.setLineWrap(true);  //автоматический перенос строки в JTextArea
+        dialogWindow.setLineWrap(true);  //Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёР№ РїРµСЂРµРЅРѕСЃ СЃС‚СЂРѕРєРё РІ JTextArea
         frame.add(new JScrollPane(dialogWindow), BorderLayout.CENTER);
         panelButtons.add(buttonStartServer);
         panelButtons.add(buttonStopServer);
         frame.add(panelButtons, BorderLayout.SOUTH);
         frame.pack();
-        frame.setLocationRelativeTo(null); // при запуске отображает окно по центру экрана
+        frame.setLocationRelativeTo(null); // РїСЂРё Р·Р°РїСѓСЃРєРµ РѕС‚РѕР±СЂР°Р¶Р°РµС‚ РѕРєРЅРѕ РїРѕ С†РµРЅС‚СЂСѓ СЌРєСЂР°РЅР°
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        //класс обработки события при закрытии окна приложения Сервера
+        //РєР»Р°СЃСЃ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ РїСЂРё Р·Р°РєСЂС‹С‚РёРё РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ РЎРµСЂРІРµСЂР°
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -56,25 +56,25 @@ public class ViewGuiServer {
         });
     }
 
-    //метод который добавляет в текстовое окно новое сообщение
+    //РјРµС‚РѕРґ РєРѕС‚РѕСЂС‹Р№ РґРѕР±Р°РІР»СЏРµС‚ РІ С‚РµРєСЃС‚РѕРІРѕРµ РѕРєРЅРѕ РЅРѕРІРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ
     public void refreshDialogWindowServer(String serviceMessage) {
         dialogWindow.append(serviceMessage);
     }
 
-    //метод вызывающий диалоговое окно для ввода порта сервера
+    //РјРµС‚РѕРґ РІС‹Р·С‹РІР°СЋС‰РёР№ РґРёР°Р»РѕРіРѕРІРѕРµ РѕРєРЅРѕ РґР»СЏ РІРІРѕРґР° РїРѕСЂС‚Р° СЃРµСЂРІРµСЂР°
     protected int getPortFromOptionPane() {
         while (true) {
             String port = JOptionPane.showInputDialog(
-                    frame, "Введите порт сервера:",
-                    "Ввод порта сервера",
+                    frame, "Р’РІРµРґРёС‚Рµ РїРѕСЂС‚ СЃРµСЂРІРµСЂР°:",
+                    "Р’РІРѕРґ РїРѕСЂС‚Р° СЃРµСЂРІРµСЂР°",
                     JOptionPane.QUESTION_MESSAGE
             );
             try {
                 return Integer.parseInt(port.trim());
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(
-                        frame, "Введен неккоректный порт сервера. Попробуйте еще раз.",
-                        "Ошибка ввода порта сервера", JOptionPane.ERROR_MESSAGE
+                        frame, "Р’РІРµРґРµРЅ РЅРµРєРєРѕСЂРµРєС‚РЅС‹Р№ РїРѕСЂС‚ СЃРµСЂРІРµСЂР°. РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰Рµ СЂР°Р·.",
+                        "РћС€РёР±РєР° РІРІРѕРґР° РїРѕСЂС‚Р° СЃРµСЂРІРµСЂР°", JOptionPane.ERROR_MESSAGE
                 );
             }
         }
